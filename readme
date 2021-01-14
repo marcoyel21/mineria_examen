@@ -1,0 +1,40 @@
+Marco Antonio Ramos Juárez
+Exámen Parcial
+
+El exámen parcial se estructura en este readme.
+
+
+Ej1
+
+Archivos: script0.sh    <--- Archivo con el sript
+          metadata.R
+          utils.R
+          00-load.R
+          01-prepare.R
+          02-clean.R
+          03-environment.R
+          
+  Respuesta 1: script0.sh
+  Respuesta 2: metadata.R, utils.R, 00-load.R, 01-prepare.R, 02-clean.R
+  Respuesta 3: Debido a que a nivel bit, todos los espacios y saltos de renglon se muestran codificados con 
+               un \n y a que en el texto no se mostraban ni simbolos, ni caractéres especiales (además de 
+               que era escrito en ingles) lo más probable esque se trate de archivos codificados en ASCII.
+
+  
+
+Ej2
+
+Archivos: app.R          <---Shiny APP (solo para análisis rápido)
+          EDA.Rmd        <---Rmd del Ej 2 (solo la estructura)
+          
+          paquetes.R     <---Archivo auxiliar en caso de no haber descargado los paquetes necesarios
+          conclusion.png <---Archivo auxiliar
+          EDA_files      <---Archivo auxiliar
+          rsconnect      <---Archivo auxiliar
+          
+  Respuesta: El archivo final del ejercicio 2 con las respuestas y el análisis exploratorio (Rmd+Shiny)
+             se encuentra en el siguiente link:      
+             https://marcoyel21.shinyapps.io/EDA_examen_parcial/
+          
+       
+

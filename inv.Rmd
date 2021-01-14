@@ -1,0 +1,67 @@
+---
+title: "Untitled"
+author: "Marco Antonio Ramos"
+date: "11/12/2020"
+output: html_document
+---
+Por ello en esta sección señalaremos primero las características institucionales del sistema de salud de San Luis Potosí para después describir aquellas de la de la población que pueden afectar el desarrollo de la epidemia.
+
+Las entidades subnacionales son responsables de aspectos críticos de las medidas de contención de la epidemia, de la salud pública y de los servicios sociales poniéndose en las primeras líneas de la administración de la crisis del COVID-19. Al día de hoy, los gobiernos locales han tenido que adaptarse para darle continuidad a la provisión de servicios públicos indispensables para el bienestar y la contención de la epidemia, entre ellos servicios como la  distribución de agua, sanitización y limpieza de espacios, recolección y gestión de residuos, transporte público, seguridad, servicios administrativos básicos y sobre todo los servicios de salud[@OECD2020], lo que contempla también la generación de información.
+
+
+## Riesgo asociado al sistema de salud
+
+### Infraestructura física
+
+En cuanto al estado de San Luis Potosí, en materia de salud está en el lugar 25 de los estados del país que menos invierten recursos propios. También, se ubica en el lugar 17 a nivel nacional en relación al Fondo de Aportaciones para la Infraestructura Social[@Saludslp2018].
+
+En cuanto a la capacidad física instalada (sin contar la privada) el sector salud da cuenta de 30 hospitales (generales, de especialidad, comunitarios y clínicas hospital), representando 0.73 camas por cada 1000 habitantes. Cabe mencionar que antes de la epidemia, los hospitales generales y de especialidades contaban con una ocupación hospitalaria por arriba del 85%, que es el máximo parámetro para
+determinar suficiencia de camas censables[@Saludslp2018].
+
+En lo referente a las consultas médicas otorgadas en 2017 en las Instituciones del Sector Salud, ocurrieron un total de 2’205,792 consultas ligadas a la Seguridad Social mientras que ocurrieron 1,857,098 consultas abiertas a la población. Asimismo, la población acude menos a las unidades de salud, sea porque tienen un mejor estado de bienestar o salud o bien porque prefieren acudir a la medicina privada[@Saludslp2018].
+
+En tanto que la capacidad por consultorio es aun baja, dado que se requiere de almenos un consultorio para cada 3000 habitantes, en el estado se cuentan con 1.52. Si bien el promedio se encuentra dentro del parámetro normal al interior de los municipios la cifra es menor. Sin embargo, para acercar la medicina especializada la población ubicada en las zonas rurales del estado, se cuenta con una red de telemedicina ubicada en los hospitales comunitarios[@Saludslp2018]. 
+
+
+
+
+## Riesgo asociado a las características de la población
+
+Los riesgos de fatalidad del COVID-19 aumentan significantemente con la edad y la prevalencia de comorbidades[@Gerwen2020], especialmente de enfermedades crónico degenerativas como la presión alta, la obesidad, la diabetes, la supresión inmunológica y las enfermedades crónicas del hígado[@Solis2020]. 
+
+### Edad
+
+
+
+En cuanto a población adulta  y adultos mayores existen retos importantes en cuanto a la prestación de servicios de salud en enfermedades crónico degenerativas sobretodo debido a que el sistema estatal de salud no está preparado en lo que representa la atención geriátrica. En esta población tiende a incrementarse la proporción de personas que han adoptado un estilo de vida sedentario  de tal forma que la diabetes mellitus ocupa el primer lugar de mortalidad. Junto con esta enfermedad los padecimientos vasculares como la hipertensión arterial han provocado que la mortalidad por cerebrovasculares sea la segunda causa de muerte, secundaria a una *diabetes mellitus* no tratada, o bien al denominado estrés que padece la población al no contar con recursos para poder solventar sus necesidades básicas[@Saludslp2018].
+
+### Morbilidad
+
+Como en muchos países, regiones y ciudades alrededor del mundo,en San Luis Potosí las enfermedades infecciosas y parasitarias dejaron de ser las principales morbilidades entre la población para ceder su lugar a las enfermedades crónico degenerativas. Asimismo, cuando se realiza el análisis de la morbilidad general comparando las cuatro regiones del Estado, observamos que es muy similar entre todas las regiones, predominando las enfermedades transmisibles como lo son las Infecciones Respiratorias Agudas, posteriormente vemos enfermedades no transmisibles relacionadas con el estrés y con los malos hábitos de una vida saludable como serían las Hipertensión Arterial y Diabetes Mellitus y otras no transmisibles como, Infecciones de Vías
+Urinarias, Enfermedades Diarreicas Agudas la Gingivitis y Enfermedad Periodontal[@Saludslp2018].
+
+## Otros factores de riesgo 
+
+### Bajo desarrollo
+
+El nivel de desarrollo humano de San Luis Potosí se calcula mediante los logros de la entidad, en salud (0.848), educación (0.648) e ingreso (0.686), alcanzados en relación con los parámetros observados a nivel internacional. El resultado global para el estado es un Índice de Desarrollo Humano de 0.722 en 2010, comparable con el nivel de desarrollo de países como Armenia y Santa Lucía. De esta manera, el estado ocupó el lugar 24 del IDH, y el sexto lugar en cuanto a la tasa de marginación del país. 
+
+### Alta concentración y disperción de la población
+
+
+Asimismo la carencia de viviendas sigue siendo un problema en todo el estado para la población de menos recursos en donde el hacinamiento es común. En la actualidad se ha agudizado el problema del abastecimiento de agua a la población de las áreas urbanas y rurales. La falta de éstos servicios, así como el nivel sociocultural bajo e inaccesibilidad en la prestación de los mismos; son factores preponderantes para la elevada incidencia y prevalencia de enfermedades infecciosas que tienen como puerta de entrada la vía digestiva y respiratoria con las consecuencias en la salud de la población[@Saludslp2018]. 
+
+
+
+
+
+
+
+## Conclusión
+
+En el estado de San Luis Potosí existen ahora nuevos retos en salud que suponen un riesgo considerable ante el COVID-19. Por ejemplo, el envejecimiento de la población; el hecho que prevalezcan estilos de vida poco saludables,sobrepeso, obesidad, diabetes mellitus, enfermedades del aparato circulatorio, entre otras comorbidades; y el hecho que la entidad cuente con una numerosa población joven que se caracterize por estar en edad laboral y por frecuentar poco la atención médica. Asimismo entre otros factores de riesgo están un bajo desarrollo humano, la alta informalidad laboral, lo interconectado que es su economía, los vinculos internacionales que suponen tanto los emigrantes como los inmigrantes.
+
+Asimismo en cuanto a la capacidad del sistema de salud, se observan múltiples factores que indirectamente afectan las tasas de mortalidad en la población y la capacidad de generar información, entre ellos la cobertura y calidad de la atención médica y la desigualdad en los niveles de desarrollo en cada municipio. 
+
+Finalmente, cabe recordar que el análisis de la salud de una población no debe limitarse a la enumeración de los daños principales representados por la mortalidad, morbilidad, discapacidades y riesgos específicos; si bien, las acciones preventivas, curativas y de rehabilitación permiten modificar su incidencia, no se pueden dar en forma aislada e independiente del contexto económico, político y social sino como una interacción compleja de factores que determinan y condicionan los niveles de bienestar de la población[@Saludslp2018].
+

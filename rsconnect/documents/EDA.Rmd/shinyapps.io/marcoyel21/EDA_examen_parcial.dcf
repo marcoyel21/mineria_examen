@@ -1,0 +1,12 @@
+name: EDA_examen_parcial
+title: EDA_examen_parcial
+username:
+account: marcoyel21
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 3046173
+bundleId: 3931116
+url: https://marcoyel21.shinyapps.io/EDA_examen_parcial/
+when: 1606884154.35741
+asMultiple: FALSE
+asStatic: FALSE
