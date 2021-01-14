@@ -1,387 +1,356 @@
 ---
-title: "Dime con quién viviste y te diré lo que te espera"
-runningheader: "Tufte Handout with R Markdown" # only for pdf output
-subtitle: "Data Challenge" # only for html output
-author: "Equipo 03"
-date: "`r Sys.Date()`"
-output: 
-  tufte::tufte_html: default
-  runtime: shiny
-  tufte::tufte_handout:
-    citation_package: natbib
-    latex_engine: xelatex
-  tufte::tufte_book:
-    citation_package: natbib
-    latex_engine: xelatex
-bibliography: skeleton.bib
-link-citations: yes
+title: "Examen parcial"
+author: "Marco Antonio Ramos"
+date: "10/18/2020"
+output:
+  html_document:
+    theme: yeti
+    df_print: paged
+    toc: yes
+    toc_depth: '3'
+    toc_float: true
+runtime: shiny
 ---
 
 ```{r setup, include=FALSE}
-library(tufte)
-# invalidate cache when the tufte version changes
-knitr::opts_chunk$set(cache.extra = packageVersion('tufte'))
-options(htmltools.dir.version = FALSE)
-```
-
-# Introduction
-
-La creciente y persistente desigualdad en las sociedades y la aparente inhabilidad de los distintos modelos económicos tradicionales (capitalismo liberal al estilo estadounidense, capitalismo planificado al estilo chino, capitalismo intervencionista al estilo europeo o socialismo al estilo cubano) para disminuir dicha desigualdad, han impulsado un renovado interés en hacer investigación acerca de la movilidad (o inmovilidad) intergeneracional en distintos países. El enfoque parte de que existen condiciones fuera del control de cada uno de nosotros – como dónde nacemos, qué nivel educativo y qué ocupación tienen nuestros padres (por dar un par de ejemplos) – que influyen y en muchos casos incluso determinan el desempeño vital que tendremos. En ese sentido, nuestra habilidad de movernos de un decil o quintil de ingreso a otro no del todo depende sólo de nosotros.
-
-Raj Chetty, connotado economista e investigador de la prestigiada universidad de Harvard, ha dedicado una parte importante de su vida académica a estudiar el fenómeno de movilidad intergeneracional estudiando por ejemplo si el famoso “sueño americano” sigue siendo una realidad^[Mira su artículo en [*The Atlantic*](https://www.theatlantic.com/magazine/archive/2019/08/raj-chettys-american-dream/592804/)]. En este “sueño” uno puede superar cualquier deficiencia o carencia determinada por la familia y entorno socioeconómico en el que nacemos mediante, básicamente, el acceso a la educación y la dedicación al trabajo: una meritocracia en el sentido más amplio de la palabra. Tu desempeño no es otra cosa que el resultado directo de tu mérito propio. Pero, ¿es esto una realidad?
-
-Chetty ha usado sus conocimientos de teoría económica de la mano de análisis estadístico aprovechando el auge del “big data” y ha encontrado clara evidencia que el sueño americano es precisamente eso: un sueño. El porcentaje de niños estadounidenses que logran un nivel de ingreso mayor al de sus padres ha venido disminuyendo inexorablemente, al grado que hoy en día, sólo el 50% de los niños de ese país logra un nivel de ingreso mayor que el de sus padres.
-Si eso sucede en uno de los supuestos bastiones de la movilidad intergeneracional: ¿qué pasa en México? ¿Qué papel juegan las “circunstancias” de nacimiento en las oportunidades de lograr un “brincar” del decil de ingreso de nuestros padres a uno más alto? 
-
-No es sorpresa para nadie que México es un país con profundas desigualdades, y si esas desigualdades tienden a traducirse en menor movilidad intergeneracional no sólo se están perpetuando las desigualdades, también se está comprometiendo el crecimiento potencial de las personas. Los estudiosos de los temas de movilidad intergeneracional han encontrado evidencia que una movilidad baja puede ser tanto causa como consecuencia de una mayor desigualdad. Por el contrario, una mayor movilidad está normalmente asociada a patrones de desarrollo más incluyentes.
-
-# Datos en México
-
-
-Para analizar este fenómeno de movilidad intergeneracional para México nuestros especialistas analizaron los datos de la Encuesta de Movilidad ESRU-EMOVI del Centro de Estudios Espinoza Yglesias (CEEY) de 2017. Esta encuesta entrevista a una muestra representativa de más de 17,000 personas entre 25 y 64 años de edad y recopila información sociodemográfica diversa del encuestado (por ejemplo edad, género, grado de escolaridad, características de su hogar actual, acceso a la salud, ocupación, etc) así como muchas de esas mismas variables para sus padres (escolaridad, ocupación, etc) y para el hogar en el que vivía cuando tenía 14 años (agua potable, pisos de cemento, etc). En la encuesta también se le pregunta al encuestado información que le permite a los especialistas aproximar el nivel de “riqueza” relativa del individuo hoy y cuando tenía 14 años (por ejemplo analizando qué aparatos electrodomésticos y electrónicos hay o había en el hogar, y qué servicios financieros tiene o tenía al alcance como tarjetas de crédito, cuentas bancarias, etc).
-
-El objetivo de recabar toda esta información es poder evaluar en qué medida “origen es destino”, es decir comparar algunas variables dadas las circunstancias de la vida del encuestado a los 14 años (origen) con esas variables hoy (destino).
-
-```{r shiny_app, echo=FALSE, message=FALSE, warning=FALSE}
-library(shiny)
-library(plotly)
-library(ggplot2)
-library(readr)
-library(dplyr)
-
-walmart<-read.csv("data.csv")
-walmart_numeric<-walmart %>% select(where(is.numeric)) %>% names()
-walmart_categoric<-walmart %>% select(where(is.character) |  where(is.factor)) %>% names()
-
-ui <- fluidPage(
-    # Application title
-    titlePanel("Walmart Bivariados"),
-    
-    # Sidebar with a slider input for number of bins 
-    sidebarLayout(
-        sidebarPanel(
-            conditionalPanel(condition="input.tabs=='Boxplot'",
-                #Panel para bivariada cat_num
-                selectInput("num_var", "Variable_Numerica",walmart_numeric),
-                selectInput("num_cat", "Variable_Categorica", walmart_categoric) ),
-            
-            conditionalPanel(condition="input.tabs=='Scatterplot'",    
-                #Panel para bivariada numerica
-                selectInput("num_var_x", "Variable_Numerica_x",walmart_numeric),
-                selectInput("num_var_y", "Variable_Numerica_y", walmart_numeric) )
-                            
-        ),
-        
-        # Show a plot of the generated distribution
-        mainPanel(
-            tabsetPanel(type = "tabs", id='tabs',
-                tabPanel("Boxplot", plotlyOutput("boxplot")),
-                tabPanel("Scatterplot", plotlyOutput("scatterplot"))
-            )
-        )        
-    )
-)
-
-# Define server logic required to draw a histogram
-server <- function(input, output) {
-    
-    
-    
-    output$scatterplot <- renderPlotly({
-        
-        var_num_x <- input$num_var_x
-        var_num_y <- input$num_var_y
-        
-        # draw the scatterplot
-        p <-ggplot(walmart,  aes_string(x=var_num_x , y= var_num_y))+
-            geom_point(colour='aquamarine3',alpha=0.7)+
-            geom_smooth(method=lm , color="gray77", se=FALSE)
-        
-        ggplotly(p)
-    })     
-    
-    #Genera Boxplot 
-    output$boxplot <- renderPlotly({
-        var_cat <- input$num_cat
-        var_num <- input$num_var
-            
-    p <-ggplot(walmart)+
-            geom_boxplot(mapping=aes_string(x=var_cat , y=var_num), na.rm = TRUE,colour='aquamarine3',fill='royalblue3' )+
-            theme(axis.text.x = element_text(angle=90))+
-            ggtitle(paste(var_cat, ' y ', var_num)) 
-        
-    ggplotly(p)
-    })
-    
-}
-# Run the application 
-shinyApp(ui = ui, server = server)
-```
-
-Como podemos observar, a los 14 años el 35% de los encuestados vivía en localidades con menos de 2,500 habitantes (pueblos), mientras que poco más del 25% vivía en ciudades de más de 100,000 habitantes. La escolaridad máxima del 28% de los entrevistados es la primaria, 31% tiene secundaria, poco más del 18% tienen preparatoria, mientras que el 11.5% posee educación superior y posgrado. Si vemos la escolaridad de los padres, en los niveles básicos observamos una distribución de años de escolaridad similar tanto para el padre como la madre: en ambos casos más del 60% sólo tiene primaria, aproximadamente el 15% tiene secundaria. En los niveles de licenciatura y posgrado, son más los padres que alcanzan dicho nivel (casi 6% para los padres contra 2.9% para las madres con este grado de escolaridad). En cuanto al número de hijos: sólo el 4.44% de las madres tienen 1 sólo hijo, casi 37% tiene entre 2 y 4 hijos y llama la atención que hay un 18.7% que reportan haber tenido más de 9 hijos (siendo el máximo reportado de 24 hijos).
-
-
-# Headings
-
-This style provides first and second-level headings (that is, `#` and `##`), demonstrated in the next section. You may get unexpected output if you try to use `###` and smaller headings.
-
-`r newthought('In his later books')`^[[Beautiful Evidence](https://www.edwardtufte.com/tufte/books_be)], Tufte starts each section with a bit of vertical space, a non-indented paragraph, and sets the first few words of the sentence in small caps. To accomplish this using this style, call the `newthought()` function in **tufte** in an _inline R expression_ `` `r ` `` as demonstrated at the beginning of this paragraph.^[Note you should not assume **tufte** has been attached to your R session. You should either `library(tufte)` in your R Markdown document before you call `newthought()`, or use `tufte::newthought()`.]
-
-# Figures
-
-## Margin Figures
-
-Images and graphics play an integral role in Tufte's work. To place figures in the margin you can use the **knitr** chunk option `fig.margin = TRUE`. For example:
-
-```{r fig-margin, fig.margin = TRUE, fig.cap = "MPG vs horsepower, colored by transmission.", fig.width=3.5, fig.height=3.5, cache=TRUE, message=FALSE}
-library(ggplot2)
-mtcars2 <- mtcars
-mtcars2$am <- factor(
-  mtcars$am, labels = c('automatic', 'manual')
-)
-ggplot(mtcars2, aes(hp, mpg, color = am)) +
-  geom_point() + geom_smooth() +
-  theme(legend.position = 'bottom')
-```
-
-Note the use of the `fig.cap` chunk option to provide a figure caption. You can adjust the proportions of figures using the `fig.width` and `fig.height` chunk options. These are specified in inches, and will be automatically scaled down to fit within the handout margin.
-
-## Arbitrary Margin Content
-
-In fact, you can include anything in the margin using the **knitr** engine named `marginfigure`. Unlike R code chunks ```` ```{r} ````, you write a chunk starting with ```` ```{marginfigure} ```` instead, then put the content in the chunk. See an example on the right about the first fundamental theorem of calculus.
-
-```{marginfigure}
-We know from _the first fundamental theorem of calculus_ that for $x$ in $[a, b]$:
-$$\frac{d}{dx}\left( \int_{a}^{x} f(u)\,du\right)=f(x).$$
-```
-
-For the sake of portability between LaTeX and HTML, you should keep the margin content as simple as possible (syntax-wise) in the `marginefigure` blocks. You may use simple Markdown syntax like `**bold**` and `_italic_` text, but please refrain from using footnotes, citations, or block-level elements (e.g. blockquotes and lists) there.
-
-Note: if you set `echo = FALSE` in your global chunk options, you will have to add `echo = TRUE` to the chunk to display a margin figure, for example ```` ```{marginfigure, echo = TRUE} ````.
-
-## Full Width Figures
-
-You can arrange for figures to span across the entire page by using the chunk option `fig.fullwidth = TRUE`.
-
-```{r fig-fullwidth, fig.width = 10, fig.height = 2, fig.fullwidth = TRUE, fig.cap = "A full width figure.", warning=FALSE, message=FALSE, cache=TRUE}
-ggplot(diamonds, aes(carat, price)) + geom_smooth() +
-  facet_grid(~ cut)
-```
-
-Other chunk options related to figures can still be used, such as `fig.width`, `fig.cap`, `out.width`, and so on. For full width figures, usually `fig.width` is large and `fig.height` is small. In the above example, the plot size is $10 \times 2$.
-
-## Arbitrary Full Width Content
-
-Any content can span to the full width of the page. This feature requires Pandoc 2.0 or above. All you need is to put your content in a fenced `Div` with the class `fullwidth`, e.g.,
-
-```md
-::: {.fullwidth}
-Any _full width_ content here.
-:::
-```
-
-Below is an example:
-
-::: {.fullwidth}
-_R is free software and comes with ABSOLUTELY NO WARRANTY._ You are welcome to redistribute it under the terms of the GNU General Public License versions 2 or 3. For more information about these matters see https://www.gnu.org/licenses/.
-:::
-
-## Main Column Figures
-
-Besides margin and full width figures, you can of course also include figures constrained to the main column. This is the default type of figures in the LaTeX/HTML output.
-
-```{r fig-main, fig.cap = "A figure in the main column.", cache=TRUE}
-ggplot(diamonds, aes(cut, price)) + geom_boxplot()
-```
-
-# Sidenotes
-
-One of the most prominent and distinctive features of this style is the extensive use of sidenotes. There is a wide margin to provide ample room for sidenotes and small figures. Any use of a footnote will automatically be converted to a sidenote. ^[This is a sidenote that was entered using a footnote.] 
-
-If you'd like to place ancillary information in the margin without the sidenote mark (the superscript number), you can use the `margin_note()` function from **tufte** in an inline R expression. `r margin_note("This is a margin note.  Notice that there is no number preceding the note.")` This function does not process the text with Pandoc, so Markdown syntax will not work here. If you need to write anything in Markdown syntax, please use the `marginfigure` block described previously.
-
-# References
-
-References can be displayed as margin notes for HTML output. For example, we can cite R here [@R-base]. To enable this feature, you must set `link-citations: yes` in the YAML metadata, and the version of `pandoc-citeproc` should be at least 0.7.2. You can always install your own version of Pandoc from https://pandoc.org/installing.html if the version is not sufficient. To check the version of `pandoc-citeproc` in your system, you may run this in R:
-
-```{r eval=FALSE}
-system2('pandoc-citeproc', '--version')
-```
-
-If your version of `pandoc-citeproc` is too low, or you did not set `link-citations: yes` in YAML, references in the HTML output will be placed at the end of the output document.
-
-# Tables
-
-You can use the `kable()` function from the **knitr** package to format tables that integrate well with the rest of the Tufte handout style. The table captions are placed in the margin like figures in the HTML output.
-
-```{r}
-knitr::kable(
-  mtcars[1:6, 1:6], caption = 'A subset of mtcars.'
-)
-```
-
-# Block Quotes
-
-We know from the Markdown syntax that paragraphs that start with `>` are converted to block quotes. If you want to add a right-aligned footer for the quote, you may use the function `quote_footer()` from **tufte** in an inline R expression. Here is an example:
-
-> "If it weren't for my lawyer, I'd still be in prison. It went a lot faster with two people digging."
->
-> `r tufte::quote_footer('--- Joe Martin')`
-Without using `quote_footer()`, it looks like this (the second line is just a normal paragraph):
-
-> "Great people talk about ideas, average people talk about things, and small people talk about wine."
->
-> --- Fran Lebowitz
-# Responsiveness
-
-The HTML page is responsive in the sense that when the page width is smaller than 760px, sidenotes and margin notes will be hidden by default. For sidenotes, you can click their numbers (the superscripts) to toggle their visibility. For margin notes, you may click the circled plus signs to toggle visibility.
-
-# More Examples
-
-The rest of this document consists of a few test cases to make sure everything still works well in slightly more complicated scenarios. First we generate two plots in one figure environment with the chunk option `fig.show = 'hold'`:
-
-```{r fig-two-together, fig.cap="Two plots in one figure environment.", fig.show='hold', cache=TRUE, message=FALSE}
-p <- ggplot(mtcars2, aes(hp, mpg, color = am)) +
-  geom_point()
-p
-p + geom_smooth()
-```
-
-Then two plots in separate figure environments (the code is identical to the previous code chunk, but the chunk option is the default `fig.show = 'asis'` now):
-
-```{r fig-two-separate, ref.label='fig-two-together', fig.cap=sprintf("Two plots in separate figure environments (the %s plot).", c("first", "second")), cache=TRUE, message=FALSE}
-```
-
-You may have noticed that the two figures have different captions, and that is because we used a character vector of length 2 for the chunk option `fig.cap` (something like `fig.cap = c('first plot', 'second plot')`).
-
-Next we show multiple plots in margin figures. Similarly, two plots in the same figure environment in the margin:
-
-```{r fig-margin-together, fig.margin=TRUE, fig.show='hold', fig.cap="Two plots in one figure environment in the margin.", fig.width=3.5, fig.height=2.5, cache=TRUE}
-p
-p + geom_smooth(method = 'lm')
-```
-
-Then two plots from the same code chunk placed in different figure environments:
-
-```{r fig-margin-separate, fig.margin=TRUE, fig.cap=sprintf("Two plots in separate figure environments in the margin (the %s plot).", c("first", "second")), fig.width=3.5, fig.height=2.5, cache=TRUE}
-knitr::kable(head(iris, 15))
-p
-knitr::kable(head(iris, 12))
-p + geom_smooth(method = 'lm')
-knitr::kable(head(iris, 5))
-```
-
-We blended some tables in the above code chunk only as _placeholders_ to make sure there is enough vertical space among the margin figures, otherwise they will be stacked tightly together. For a practical document, you should not insert too many margin figures consecutively and make the margin crowded. 
-
-You do not have to assign captions to figures. We show three figures with no captions below in the margin, in the main column, and in full width, respectively.
-
-```{r fig-nocap-margin, fig.margin=TRUE, fig.width=3.5, fig.height=2, cache=TRUE}
-# a boxplot of weight vs transmission; this figure
-# will be placed in the margin
-ggplot(mtcars2, aes(am, wt)) + geom_boxplot() +
-  coord_flip()
-```
-```{r fig-nocap-main, cache=TRUE}
-# a figure in the main column
-p <- ggplot(mtcars, aes(wt, hp)) + geom_point()
-p
-```
-```{r fig-nocap-fullwidth, fig.fullwidth=TRUE, fig.width=10, fig.height=3, cache=TRUE}
-# a fullwidth figure
-p + geom_smooth(method = 'lm') + facet_grid(~ gear)
-```
-
-# Some Notes on Tufte CSS
-
-There are a few other things in Tufte CSS that we have not mentioned so far. If you prefer `r sans_serif('sans-serif fonts')`, use the function `sans_serif()` in **tufte**. For epigraphs, you may use a pair of underscores to make the paragraph italic in a block quote, e.g.
-
-> _I can win an argument on any topic, against any opponent. People know this, and steer clear of me at parties. Often, as a sign of their great respect, they don't even invite me._
->
-> `r quote_footer('--- Dave Barry')`
-We hope you will enjoy the simplicity of R Markdown and this R package, and we sincerely thank the authors of the Tufte-CSS and Tufte-LaTeX projects for developing the beautiful CSS and LaTeX classes. Our **tufte** package would not have been possible without their heavy lifting.
-
-You can turn on/off some features of the Tufte style in HTML output. The default features enabled are:
-
-```yaml
-output:
-  tufte::tufte_html:
-    tufte_features: ["fonts", "background", "italics"]
-```
-
-If you do not want the page background to be lightyellow, you can remove `background` from `tufte_features`. You can also customize the style of the HTML page via a CSS file. For example, if you do not want the subtitle to be italic, you can define
-
-```css
-h3.subtitle em {
-  font-style: normal;
-}
-```
-
-in, say, a CSS file `my_style.css` (under the same directory of your Rmd document), and apply it to your HTML output via the `css` option, e.g.,
-
-```yaml
-output:
-  tufte::tufte_html:
-    tufte_features: ["fonts", "background"]
-    css: "my_style.css"
-```
-
-There is also a variant of the Tufte style in HTML/CSS named "[Envisoned CSS](https://github.com/nogginfuel/envisioned-css)". This style can be used by specifying the argument `tufte_variant = 'envisioned'` in `tufte_html()`^[The actual Envisioned CSS was not used in the **tufte** package. We only changed the fonts, background color, and text color based on the default Tufte style.], e.g.
-
-```yaml
-output:
-  tufte::tufte_html:
-    tufte_variant: "envisioned"
-```
-
-To see the R Markdown source of this example document, you may follow [this link to Github](https://github.com/rstudio/tufte/raw/master/inst/rmarkdown/templates/tufte_html/skeleton/skeleton.Rmd), use the wizard in RStudio IDE (`File -> New File -> R Markdown -> From Template`), or open the Rmd file in the package:
-
-```{r eval=FALSE}
-file.edit(
-  tufte:::template_resources(
-    'tufte_html', '..', 'skeleton', 'skeleton.Rmd'
-  )
-)
-```
-
-This document is also available in [Chinese](https://rstudio.github.io/tufte/cn/), and its `envisioned` style can be found [here](https://rstudio.github.io/tufte/envisioned/).
-
-```{r bib, include=FALSE}
-# create a bib file for the R packages used in this document
-knitr::write_bib(c('base', 'rmarkdown'), file = 'skeleton.bib')
-```
-
-```{r include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-library(readr)
-library(stringr)
-library(tidyr)
-library(dplyr)
-library(ggplot2)
-library(ggthemes)
-library(shinydashboard)
-library(GGally)
 ```
+
 
 ```{r eruptions, echo=FALSE, message=FALSE, warning=FALSE}
-source("utils.R"     , encoding = 'UTF-8')
+source("03-environment.R",   encoding = 'UTF-8')
 ```
 
-```{r  echo=FALSE, message=FALSE, warning=FALSE}
-mydata<-read_csv("data.csv")
+El objetivo de este documento es combinar las herramientas vistas en clase para facilitar la limpieza de los datos y el análisis exploratorio. La base de datos proviene de una empresa de seguros y contiene automóbiles y sus características. El objetivo del exámen parcial es lograr seleccionar las variables adecuadas para la etapa de modelaje en la que se pretende predecir el precio del auto.
+
+
+# Limpieza
+
+Lo primero que se realiza es la limpieza de datos.
+
+## Diagnóstico
+
+```{r echo=F}
+library(kableExtra)
+kbl(cbind(rawdata, rawdata))  %>%
+  kable_paper() %>%
+  scroll_box(width = "100%", height = "200px")
 ```
 
-# Intro
+Podemos notar que: A) hay un problema de datos invadiendo columnas (filas traslapadas) por lo que desplazan los valores, en particular algunos de los valores de la columna *curb_weight* están "pegados" con valores de la columna siguiente; B) que existen errores de registro en la columna *curb_weight* y en la columna *wheel_base*; C) finalmente, que están coexistiendo dos sistemas de *missing values*, aquél original de los datos (señalado con "?") y aquel que R impone sobre los datos ("NA").
+
+
+## Filas traslpadas
+
+Para corregir este problema, obtamos por el método visto en clase en el que extraemos primero las filas problemáticas, luego separamos las columnas problemáticas con expresiones regulares y, finalmente, imputamos las filas ya corregidas en la base de datos original.
+
+
+```{r echo=TRUE, eval=FALSE}
+
+problematic_rows <- readr::problems(parcial_data)$row
+
+parcial_data[problematic_rows,] <- parcial_data %>% 
+  slice(problematic_rows) %>% 
+  unite(col="all", -seq(1:13), sep = "/", remove=TRUE) %>% 
+  extract(all, into=c("curb_weight", "engine_type", "resto"), regex="([0-9]{4})([a-z]+)/(.*)/NA", remove=TRUE) %>% 
+  separate(resto, into=names(parcial_data)[16:26], sep="/", remove=TRUE) %>% 
+  readr::type_convert() %>%
+  mutate(across(c("wheel_base",
+                  "price",
+                  "peak_rpm",
+                  "horsepower",
+                  "engine_size",
+                  "curb_weight"),
+                as.character))
+```
+
+
+## Errores puntuales.
+
+Si regresamos a la tabla original, notamos que la variable *wheel-base* cuenta con un valor caracter en lugar de numérico en la fila 157. Para ello optamos por sustituirlo directamente. De manera similar, además de lo que acabamos de corregir, *curb_weight* cuenta con algunas filas con dos ceros adicionales al valor real, para solucionar esto simplemente le damos un formato definido en el que la columna solo acepta valores númericos de no más de 4 caractéres (los primeros).
+
+```{r echo=TRUE, eval=FALSE}
+parcial_data$'wheel_base'[157]=95.7
+parcial_data$'curb_weight' <- substr(parcial_data$'curb_weight', 0, 4)
+```
+
+## Missing values
+
+Finalmente, optamos por cambiar los *missing values* originales por NAs, con el fin de que no transformen las columnas donde están a columnas de caracteres.
+
+```{r echo=TRUE, eval=FALSE}
+
+parcial_data[parcial_data == "?"] <- NA
+
+```
+
+Posteriormente, realizamos una gráfica para visualizar la ocurrencia de missing values. Lo que podemos notar es que 159 filas no presentan ningún missing value; sin embargo 46 filas presentan al menos uno y tan solo dos filas tienen más de 2 missing vallues.
+
+Además notamos la variable que presentan el mayor número de missing values es *normalized_losses* con 41. Fuera de esa columna, los missing values no suponen riesgo mayor para el análisis exploratorio.
+
+```{r, message=FALSE, warning=FALSE, echo= F, out.width="100%"}
+library(mice)
+md.pattern(parcial_data, rotate.names = T)
+```
+
+## Imputación
+
+Podríamos optar por imputar los *missing values* pero para eso tendríamos que evaluar la pertinencia y el posible sesgo.
+Por ejemplo, para *price* por lo pronto, antes de adelantarnos al modelo, podríamos hacer una regresión con base en la variable más correlacionada. En cuanto a *stroke, horsepower, peak_rpm* y *num_of_doors*, como contamos con la marca del coche, podríamos ver si los autos de la misma marca comparten estas características y en caso de ser cierto, podríamos hacer una imputación por valor central. Finalmente, el caso más complicado es el de *normalized_losses* donde faltan muchos valores. Considero que en este caso podriamos realizar una imputación con base en k-means. Sin embargo, debido a las restricciones de tiempo, no se realizo imputación alguna.
+
+## Datos finales
+
+Finalmente, le asignamos la clase adecuada a cada columna.
+
+```{r, message=FALSE}
+
+parcial_data<- readr::type_convert(parcial_data)
+```
+
+Los datos después de la limpieza lucen de la siguiente manera:
+
+```{r echo=F}
+kbl(cbind(parcial_data, parcial_data))  %>%
+  kable_paper() %>%
+  scroll_box(width = "100%", height = "200px")
+```
+
+
+
+
 
 # EDA
 
 Ahora realizaremos el análisis exploratorio.
 
+## General
+
+```{r warning=F, echo= F, message=F}
+ggcorr(parcial_data, geom = "blank", label = TRUE, hjust = 0.75) +
+  geom_point(size = 10, aes(color = coefficient > 0, alpha = abs(coefficient) > 0.5)) +
+  scale_alpha_manual(values = c("TRUE" = 0.25, "FALSE" = 0)) +
+  guides(color = FALSE, alpha = FALSE)
+```
+
+Para echar un vistazo general, corremos un correlograma acotado a solo con aquellas variables continuas más correlacionadas. De este análisis general podemos notar que sí hay variables correlacionadas con el precio, muchas de las cuales están correlacionadas entre sí; y que hay más variables con correlación positiva. Solamente *highway_mpg* y *city_mpg* presentan correlaciones negativas de manera significante. 
+
+Habiendo hecho una revisión preliminar, centraremos nuestra atención en las variables que están correlacionadas de manera *wheel_base, length, width, curb_weight, engine_size, bore, horpower,highway_mpg* y *city_mpg*.
+
+
 ## Univariado
 
 
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+mydata <- parcial_data
+
+shinyApp(
+
+ ui <- tabPanel("Univariado",fluidPage(titlePanel("Univariado"),
+                                             sidebarLayout(
+                                                 sidebarPanel(
+                                                     uiOutput(outputId = "aa")
+                                                 ),
+                                                 mainPanel(textOutput("a"),
+                                                           verbatimTextOutput("summary"),
+                                                           plotOutput("plot", click = "plot_click")
+                                                 )
+                                             )
+                  )),
 
 
+server <- function(input,output) {
+    
+    output$aa <- renderUI({
+        selectInput(inputId = "aa2", 
+                    label="Selecciona una variable para analizar:",
+                    choices = colnames(mydata))
+    })
+    
+    
+    mysubsetdata <- eventReactive(input$aa2,{
+        mydata[[input$aa2]]
+    })
+    
+    output$summary <- renderPrint({
+        summary(mysubsetdata())
+    })
+    
+    output$plot <- renderPlot({
+        general(mydata,mysubsetdata())
+    })
+}, options = list(height = 650))
+```
+
+Del análisis univariado podemos concluir que todas las variables con un coeficiente de correlación positivo mayor a.5 (*wheel_base, length, width, curb_weight, engine_size, bore, horpower*) tienen un adistribución mas o menos normal pero sesgada a la izquierda. Solamente *lenght* en menor medida *width* tienen una distribución medianamente simétrica. Esto es interesante porque puede que las variables que tienen que ver con potencia esten siguiendo un patrón común.
 
 
+## Bivariado
+
+Ahora procedemos a hacer un análisis bivariado. De este análisis concluimos que las variables que están correlacionadas positivamente con el ingreso en realidad las podemos clasificar en dos tipos, de acuerdo a su relación entre ellas: uno grupo de variables relacionadas con la potencia del vehículo y otro relacionado con las dimensiones. Si bien, estos grupos también están muy relacionados entre sí podemos distringuirlos por la poca correlación (relativamente) que puede llegar a haber entre sus miembros, por ejemplo, entre *wheel_base* y *horsepower*.
+
+Asimismo otro grupo, mucho más obvio de encontrar, son las variables *mpg* para carretera y para ciudad que presentan una correlación casi perfecta.
 
 
+De esta manera definimos los grupos:
+
+Potencia = {*wheel_base, length, width, curb_weight*}
+
+Dimensiones = {*engine_size, bore, horpower,highway_mpg*}
+
+Eficiencia = {*highway_mpg, city_mpg*}
+
+En cuanto a las variables categóricas, se descubrio que las variables categóricas que pueden ser explicativas en realidad están muy relacionadas con los grupos anteriores: por ejemplo, *engine_location*, *engine_type*, *engine_location* y *cylinder* con Potencia; y *body_style* y *drive wheels*  con Dimensiones.
+
+Llama la atención que las variables creadas por los actuarios en la base de datos no están tan correlacionadas con el precio como otras.
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+shinyApp(
+
+ ui <- tabPanel("Bivariado",fluidPage(titlePanel("Bivariado"),
+                                                   sidebarLayout(
+                                                       sidebarPanel(
+                                                           uiOutput(outputId = "bb"),
+                                                           uiOutput(outputId = "cc"),
+                                                           multiple = 
+                                                               TRUE),
+                           
+                                                       mainPanel(textOutput("b"),
+                                                                 verbatimTextOutput("summary2"),
+                                                                 verbatimTextOutput("summary3"),
+                                                                 plotOutput("plot2", click = "plot_click")
+                                                       )
+                                                   )
+                  )),
+
+
+server <- function(input,output) {
+    
+     output$bb <- renderUI({
+        selectInput(inputId = "bb2", 
+                    label="Selecciona una variable para analizar",
+                    choices = colnames(mydata))
+    })
+    
+    
+    mysubsetdata2 <- eventReactive(input$bb2,{
+        mydata[[input$bb2]]
+    })
+    
+    output$cc <- renderUI({
+        selectInput(inputId = "cc2", 
+                    label="Seleccciona otra variable para analizar",
+                    choices = colnames(mydata))
+    })
+    
+    mysubsetdata3 <- eventReactive(input$cc2,{
+        mydata[[input$cc2]]
+    })  
+    output$summary2 <- renderPrint({
+        summary(mysubsetdata2())
+    })
+    
+    output$summary3 <- renderPrint({
+        summary(mysubsetdata3())
+    })
+    
+    output$plot2 <- renderPlot({
+        bigeneral(mydata,input$bb2,input$cc2)
+    })
+    
+}, options = list(height = 650))
+
+```
+
+## Multivariado
+
+En esta parte aprovechamos para graficar tres dimensiones y ver si las variables categóricas nos podrían ayudar como criterio de desempate para predecir precios, cuando el potencial predictivo de las variables continuas se ha agotado.
+
+En este sentido,  estas variables nos permiten diferenciar de mayor manera entre grupos que un análisis bidimensional. En consecuencia, se consideró que *drive wheels*, *engine_type* y *num_of_cylinders* tienen un alto potencial predictivo cuando van acompañados de otras variables.
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+shinyApp(
+
+ ui <- tabPanel("Multivariado",fluidPage(titlePanel("Multivariado"),
+                                                   sidebarLayout(
+                                                       sidebarPanel(
+                                                           uiOutput(outputId = "dd"),
+                                                           uiOutput(outputId = "ee"),
+                                                           uiOutput(outputId = "ff"),
+                                                           multiple = 
+                                                               TRUE),
+                                                       
+                                                       mainPanel(textOutput("c"),
+                                                                 verbatimTextOutput("summary4"),
+                                                                 verbatimTextOutput("summary5"),
+                                                                 verbatimTextOutput("summary6"),
+                                                                 plotOutput("plot3", click = "plot_click")
+                                                       )
+                                                   ))),
+
+
+server <- function(input,output) {
+    
+      output$dd <- renderUI({
+        selectInput(inputId = "dd2", 
+                    label="Select una parametro de color (b)",
+                    choices = colnames(mydata %>% select_if(is.character)))
+    })
+    
+    
+    mysubsetdata4 <- eventReactive(input$dd2,{
+        mydata[[input$dd2]]
+    })
+    
+    output$ee <- renderUI({
+        selectInput(inputId = "ee2", 
+                    label="Seleccciona una variable para analizar",
+                    choices = colnames(mydata))
+    })
+    
+    mysubsetdata5 <- eventReactive(input$ee2,{
+        mydata[[input$ee2]]
+    })  
+    
+    output$ff <- renderUI({
+        selectInput(inputId = "ff2", 
+                    label="Seleccciona otra variable para analizar",
+                    choices = colnames(mydata))
+    })
+    
+    mysubsetdata6 <- eventReactive(input$ff2,{
+        mydata[[input$ff2]]
+    })  
+    
+    output$summary4 <- renderPrint({
+        summary(mysubsetdata4())
+    })
+    
+    output$summary5 <- renderPrint({
+        summary(mysubsetdata5())
+    })
+    
+    output$summary6 <- renderPrint({
+        summary(mysubsetdata6())
+    })
+    
+    output$plot3 <- renderPlot({
+        multigeneral(mydata,mysubsetdata4(),input$ee2,input$ff2)
+    })
+    
+},options = list(height = 650))
+
+```
+
+# Conclusión
+
+Del análisis exploratorio se concluye que podemos categorizar a las variables en tres grupos: el grupo A (Eficiencia) con un claro efecto negativo en el precio y los grupos B (Dimensiones) y C (Potencia) con un efecto positivo. La distinción entre ambos está en que, en primer lugar, el impacto positivo en el precio es mayor en el grupo C; en segundo lugar, en que a pesar de que ambos grupos estén muy correlacionados, el grupo C presenta una relación muy clara los caballos de fuerza; finalmente, en que el grupo A y el C presentan una correlación negativa más marcada.
+
+Asimismo, podríamos considerar un cuarto grupo de variables categóricas para "desempatar" cuando las variables continuas ya no puedan diferenciar entre casos particulares. Dichas variables son *drive wheels*, *engine_type* y *num_of_cylinders*.
+
+En este sentido, se concluye que las variables de estos tres grupos son las que tienen el mayor potencial predictivo. Sin embargo, debido a la correlación entre ellas, considero que cualquier modelo que contemple al menos *horsepower^* para medir potenica, *wheel_base* para medir dimensiones y *highway_mpg* para medir eficiencia estaría más que completo. Asimismo, se podría potencializar el modelo si usamos alguna (o las tres) de las tres variables categóricas.
+
+```{r, message=FALSE, warning=FALSE, echo= F,out.width="1000%"}
+knitr::include_graphics("conclusion.png")
+```
